@@ -1,37 +1,43 @@
 // cypress/e2e/sownloader_download.cy.js
 
+Cypress.on('uncaught:exception', () => {
+    return false;
+});
+
 describe('Smule to MP3 via Sownloader', () => {
-  const smuleUrl = 'https://www.smule.com/recording/barbra-streisand-cats-memory-epic-cover/698735767_5030064796';
+    it('downloads MP3 from Sownloader', () => {
+        cy.readFile('cypress/data/smule_urls.txt').then((content) => {
+            const urls = content.split('\n').filter(Boolean);
 
-  it('downloads MP3 from Sownloader', () => {
-    cy.visit('https://sownloader.com');
+            cy.writeFile('cypress/data/skipped_urls.txt', '');
 
-    // Input Smule URL
-    cy.get('input[name="url"]', { timeout: 10000 })
-      .should('be.visible')
-      .type(smuleUrl);
+            for (const url of urls) {
+                cy.log(`Processing: ${url}`);
+                cy.visit('https://sownloader.com');
 
-    cy.get('button[type="submit"]')
-      .should('be.visible')
-      .click();
+                cy.get('input[name="url"]', { timeout: 10000 })
+                    .should('be.visible')
+                    .clear()
+                    .type(url);
 
-    // Wait for download section to appear
-    cy.get('a.btn-download[href*="downloader.php"]', { timeout: 20000 })
-      .should('have.attr', 'href')
-      .then(href => {
-        const downloadUrl = href;
-        cy.log('Download link:', downloadUrl);
+                cy.get('body').then($body => {
+                    if ($body.text().includes('Error! Could not find performance data. Please try again later.')) {
+                        cy.log('❌ Error: No performance data. Skipping...');
+                        cy.writeFile('cypress/data/skipped_urls.txt', `${url}\n`, { flag: 'a+' }); // anhängen
+                        return;
+                    }
 
-        // Programmatic file download using browser-fetch workaround
-        cy.request({
-          url: downloadUrl,
-          encoding: 'binary'
-        }).then((response) => {
-          const filename = downloadUrl.split('name=')[1].split('&')[0] + '.mp3';
-          const path = `cypress/downloads/smule/${filename}`;
+                    cy.contains('button', 'Download as MP3', { timeout: 20000 })
+                        .should('be.visible')
+                        .click();
 
-          cy.writeFile(path, response.body, 'binary');
+                    cy.contains('This might take a few minutes depending on the size of your performance', { timeout: 30000 })
+                        .should('be.visible');
+
+                    cy.contains('This might take a few minutes depending on the size of your performance', { timeout: 60000 })
+                        .should('not.exist');
+                });
+            }
         });
-      });
-  });
+    });
 });

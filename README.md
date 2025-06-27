@@ -115,6 +115,7 @@ tbd
 - [x] einzelne Videos als mp3/mp4 download
 - [ ] Smule Download
 - [ ] Smule Playlist Support (TBD)
+- [x] remove all metadata in cypress/downloads folder
 
 | Name    | Age | Role       |
 |---------|-----|------------|

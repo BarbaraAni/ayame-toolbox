@@ -8,3 +8,4 @@ uploads/
 .env
 private.md
 node_modules
+cypress/data
