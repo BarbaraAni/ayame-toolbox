@@ -1,16 +1,9 @@
 from flask import Flask, request, jsonify
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse, urlunparse
-import json
-import time
-import re
-import os
 import yt_dlp
 import requests
-from bs4 import BeautifulSoup
-import urllib.parse
-import os
 import subprocess
+import os
 
 def download_media(url, file_format="mp3", startAt=None, endAt=None):
     if "youtube.com" in url or "youtu.be" in url:
