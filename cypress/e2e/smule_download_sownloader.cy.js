@@ -53,7 +53,6 @@ describe('Smule to MP3 via Sownloader', () => {
                           }
                         });
                       });
-
                 });
             }
         });
