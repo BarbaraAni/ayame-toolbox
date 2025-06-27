@@ -41,9 +41,12 @@ def download():
     data = request.get_json()
 
     url = data.get("url")
-    format_choice = data.get("format", "mp4").lower()
 
-    # Ensure startAt and endAt are converted to integers (if they exist)
+    format_choice = data.get("format", "mp4").lower()
+    allowed_formats = {"mp3", "mp4"}
+    if format_choice not in allowed_formats:
+        return jsonify({"error": f"Invalid format: {format_choice}. Allowed: {', '.join(allowed_formats)}"})
+
     startAt = int(data.get("startAt")) if data.get("startAt") else None
     endAt = int(data.get("endAt")) if data.get("endAt") else None
 
@@ -51,4 +54,6 @@ def download():
 
 if __name__ == '__main__':
     print("[INFO] Starting Flask server...")
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
+
+
