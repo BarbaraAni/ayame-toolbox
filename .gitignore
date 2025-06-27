@@ -7,3 +7,4 @@ downloads/
 uploads/
 .env
 private.md
+node_modules

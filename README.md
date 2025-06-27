@@ -113,7 +113,7 @@ tbd
 
 - [x] Playlist as mp3s download
 - [x] einzelne Videos als mp3/mp4 download
-- [x] Smule Performance Download
+- [ ] Smule Download
 - [ ] Smule Playlist Support (TBD)
 
 | Name    | Age | Role       |
