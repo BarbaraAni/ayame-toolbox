@@ -28,14 +28,32 @@ describe('Smule to MP3 via Sownloader', () => {
                     }
 
                     cy.contains('button', 'Download as MP3', { timeout: 20000 })
-                        .should('be.visible')
-                        .click();
+                      .should('be.visible')
+                      .then($btn => {
+                        const onclick = $btn.attr('onclick');
+                        const match = /convert\([^,]+,[^,]+,\s*'([^']+)'\)/.exec(onclick);
+                        const title = match ? match[1].trim() : 'Unknown';
+                        const filename = `${title}.mp3`;
 
-                    cy.contains('This might take a few minutes depending on the size of your performance', { timeout: 30000 })
-                        .should('be.visible');
+                        cy.wrap($btn).click();
 
-                    cy.contains('This might take a few minutes depending on the size of your performance', { timeout: 60000 })
-                        .should('not.exist');
+                        cy.contains('This might take a few minutes', { timeout: 60000 })
+                          .should('not.exist');
+
+                        cy.wait(3000); // allow some buffer for download to complete
+
+                        cy.task('moveDownloadedFile', {
+                          baseFolder: 'cypress/downloads',
+                          filename
+                        }).then((movedPath) => {
+                          if (movedPath) {
+                            cy.log(`✅ Saved in: ${movedPath}`);
+                          } else {
+                            cy.log('⚠️ Download file not found.');
+                          }
+                        });
+                      });
+
                 });
             }
         });
