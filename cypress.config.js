@@ -25,6 +25,12 @@ module.exports = {
 
           return destPath;
         },
+
+        checkFileExists({ folder, filename }) {
+          const fullPath = path.join(folder, filename);
+          return fs.existsSync(fullPath);
+        },
+
         logToTerminal(message) {
           console.log(message);
           return null;

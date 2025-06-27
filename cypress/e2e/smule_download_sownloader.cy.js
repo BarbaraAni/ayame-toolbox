@@ -1,4 +1,5 @@
 // cypress/e2e/sownloader_download.cy.js
+import 'cypress-wait-until';
 
 Cypress.on('uncaught:exception', () => {
     return false;
@@ -34,14 +35,24 @@ describe('Smule to MP3 via Sownloader', () => {
                             const onclick = $btn.attr('onclick');
                             const match = /convert\([^,]+,[^,]+,\s*'([^']+)'\)/.exec(onclick);
                             const title = match ? match[1].trim() : 'Unknown';
-                            const filename = `${title}.mp3`;
+                            const safeTitle = title.replace(/[:*?"<>|\\\/]/g, '_');
+                            const filename = `${safeTitle}.mp3`;
+                            cy.task('logToTerminal', `Title ${title} - SafeTitle: ${safeTitle}`);
 
                             cy.wrap($btn).click();
 
                             cy.contains('This might take a few minutes', { timeout: 60000 })
                                 .should('not.exist');
 
-                            cy.wait(3000);
+                            cy.waitUntil(() =>
+                                cy.task('checkFileExists', {
+                                    folder: 'cypress/downloads',
+                                    filename
+                                }), {
+                                    errorMsg: `XX File never appeared: ${filename}`,
+                                    timeout: 15000,
+                                    interval: 1000
+                                });
 
                             cy.task('moveDownloadedFile', {
                                 baseFolder: 'cypress/downloads',
@@ -52,12 +63,13 @@ describe('Smule to MP3 via Sownloader', () => {
                                     cy.task('logToTerminal', `SUCCESS ${url}`);
                                 } else {
                                     cy.log('Download file not found.');
-                                    cy.task('logToTerminal', `XX FAIL: ${url}`);
+                                    cy.task('logToTerminal', `XX MOVE FAIL: ${url}`);
                                 }
                             });
                         });
                 });
             }
+            cy.wait(7000); // or wait for file detection if implemented
         });
     });
 });

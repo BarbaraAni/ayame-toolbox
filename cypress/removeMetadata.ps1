@@ -24,26 +24,27 @@ foreach ($file in $mediaFiles) {
     $tempOutput = Join-Path -Path $file.Directory.FullName -ChildPath $cleanName
 
     Write-Host "Bearbeite: $($file.FullName)"
-    ffmpeg -y -i "$input" -map_metadata -1 -c copy "$tempOutput" > $null 2>&1
+    $logFile = Join-Path $file.Directory.FullName "ffmpeg_error.log"
+    ffmpeg -y -i "`"$input`"" -map_metadata -1 -c copy "`"$tempOutput`"" 2>> "$logFile"
 
-    if (Test-Path $tempOutput) {
-        Remove-Item "$input" -Force
-        Rename-Item "$tempOutput" "$input"
+    if (Test-Path -LiteralPath $tempOutput) {
+        Remove-Item -LiteralPath $input -Force
+        Rename-Item -LiteralPath $tempOutput -NewName $input
         Write-Host "Metadaten entfernt: $($file.Name)"
 
         # Datei verschieben
-        $fileNameCleaned = $file.Name -replace 'amp;039;', "'"
+        $fileNameCleaned = $file.Name -replace 'amp;039;', "'" -replace 'amp;amp;', '&'
         $targetPath = Join-Path $targetBase $fileNameCleaned
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($fileNameCleaned)
         $ext = [System.IO.Path]::GetExtension($fileNameCleaned)
         $counter = 1
 
-        while (Test-Path $targetPath) {
+        while (Test-Path -LiteralPath $targetPath) {
             $targetPath = Join-Path $targetBase "$baseName`_$counter$ext"
             $counter++
         }
 
-        Move-Item -Path $file.FullName -Destination $targetPath -Force
+        Move-Item -LiteralPath $file.FullName -Destination $targetPath -Force
         Write-Host "Verschoben nach: $([System.IO.Path]::GetFileName($targetPath))`n"
     } else {
         Write-Host "Fehler beim Verarbeiten von: $($file.Name)`n"
