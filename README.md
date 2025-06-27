@@ -109,6 +109,13 @@ tbd
 
 # 🎧 Smule Downloads
 - add all urls that you want to download to cypress/data/smule_urls.txt with new lines inbetween
+- in dev tools console, run the following command - then copy to smule_urls.txt and replace all \n with enters
+- ```powershell 
+    [...document.querySelectorAll('a[href*="/recording/"]')]
+    .map(a => a.href)
+    .filter((v, i, a) => a.indexOf(v) === i)  // remove duplicates
+    .join('\n')
+    ```
 - run cypress
 - ```powershell 
   npx cypress run --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'

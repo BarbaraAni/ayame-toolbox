@@ -52,7 +52,13 @@ describe('Smule to MP3 via Sownloader', () => {
                                     errorMsg: `XX File never appeared: ${filename}`,
                                     timeout: 15000,
                                     interval: 1000
-                                });
+                                }
+                            ).catch(() => {
+                                 // Datei ist nach X Sekunden nicht da
+                                 cy.task('logToTerminal', `XX File never appeared: ${filename}`);
+                                 cy.writeFile('cypress/data/skipped_urls.txt', `${url}\n`, { flag: 'a+' });
+                                 return; // überspringe Rest
+                             });
 
                             cy.task('moveDownloadedFile', {
                                 baseFolder: 'cypress/downloads',
