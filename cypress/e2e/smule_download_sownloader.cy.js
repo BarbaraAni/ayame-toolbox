@@ -29,35 +29,33 @@ describe('Smule to MP3 via Sownloader', () => {
                     }
 
                     cy.contains('button', 'Download as MP3', { timeout: 20000 })
-                      .should('be.visible')
-                      .then($btn => {
-                        const onclick = $btn.attr('onclick');
-                        const match = /convert\([^,]+,[^,]+,\s*'([^']+)'\)/.exec(onclick);
-                        const title = match ? match[1].trim() : 'Unknown';
-                        cy.task('logToTerminal', `Title for: ${url} - ${title}`);
-                        const filename = `${title}.mp3`;
+                        .should('be.visible')
+                        .then($btn => {
+                            const onclick = $btn.attr('onclick');
+                            const match = /convert\([^,]+,[^,]+,\s*'([^']+)'\)/.exec(onclick);
+                            const title = match ? match[1].trim() : 'Unknown';
+                            const filename = `${title}.mp3`;
 
-                        cy.wrap($btn).click();
+                            cy.wrap($btn).click();
 
-                        cy.contains('This might take a few minutes', { timeout: 60000 })
-                          .should('not.exist');
+                            cy.contains('This might take a few minutes', { timeout: 60000 })
+                                .should('not.exist');
 
-                        cy.task('logToTerminal', `Download clicked for: ${url} - waiting`);
-                        cy.wait(1500);
+                            cy.wait(3000);
 
-                        cy.task('moveDownloadedFile', {
-                          baseFolder: 'cypress/downloads',
-                          filename
-                        }).then((movedPath) => {
-                          if (movedPath) {
-                            cy.log(`Saved in: ${movedPath}`);
-                            cy.task('logToTerminal', `Saved ${url} ${filename}`);
-                          } else {
-                            cy.log('Download file not found.');
-                            cy.task('logToTerminal', `Download file not found: ${url} ${filename}`);
-                          }
+                            cy.task('moveDownloadedFile', {
+                                baseFolder: 'cypress/downloads',
+                                filename
+                            }).then((movedPath) => {
+                                if (movedPath) {
+                                    cy.log(`Saved in: ${movedPath}`);
+                                    cy.task('logToTerminal', `SUCCESS ${url}`);
+                                } else {
+                                    cy.log('Download file not found.');
+                                    cy.task('logToTerminal', `XX FAIL: ${url}`);
+                                }
+                            });
                         });
-                      });
                 });
             }
         });
