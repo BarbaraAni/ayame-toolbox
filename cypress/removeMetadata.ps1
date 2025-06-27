@@ -34,27 +34,38 @@ foreach ($file in $mediaFiles) {
     }
 }
 
-# Jetzt alle Dateien aus Unterordnern in den Hauptordner verschieben
+# Alle Dateien aus Unterordnern in den Hauptordner verschieben
 $mainFolder = $folderPath.Path
 $filesToMove = Get-ChildItem -Path $mainFolder -Recurse -File
 
 foreach ($file in $filesToMove) {
-    if ($file.DirectoryName -ne $mainFolder) {
+    $currentDir = (Resolve-Path $file.DirectoryName).Path
+    if ($currentDir -ne $mainFolder) {
         $targetPath = Join-Path $mainFolder $file.Name
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
         $ext = $file.Extension
         $counter = 1
 
-        # Wenn die Datei bereits existiert, eindeutigen Namen erzeugen
+        # Wenn Datei bereits existiert: Umbenennung
         while (Test-Path $targetPath) {
             $targetPath = Join-Path $mainFolder "$baseName`_$counter$ext"
             $counter++
         }
 
         Move-Item -Path $file.FullName -Destination $targetPath -Force
-        Write-Host "Verschoben: $($file.Name) -> $([System.IO.Path]::GetFileName($targetPath))"
+        Write-Host "Verschoben: $($file.Name) → $([System.IO.Path]::GetFileName($targetPath))"
     }
 }
 
-Write-Host "`n Alle Dateien bereinigt und ins Hauptverzeichnis verschoben!" -ForegroundColor Green
+# 🔁 Leere Unterordner löschen
+$emptyFolders = Get-ChildItem -Path $mainFolder -Recurse -Directory | Where-Object {
+    @(Get-ChildItem -Path $_.FullName -Force -Recurse -File).Count -eq 0
+}
+
+foreach ($folder in $emptyFolders) {
+    Remove-Item -Path $folder.FullName -Force -Recurse
+    Write-Host "Gelöschter leerer Ordner: $($folder.FullName)"
+}
+
+Write-Host "`n Alle Dateien bereinigt, verschoben und leere Ordner gelöscht!" -ForegroundColor Green
 pause
