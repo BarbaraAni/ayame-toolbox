@@ -24,6 +24,10 @@ module.exports = {
           fse.moveSync(srcPath, destPath, { overwrite: true });
 
           return destPath;
+        },
+        logToTerminal(message) {
+          console.log(message);
+          return null;
         }
       });
     },

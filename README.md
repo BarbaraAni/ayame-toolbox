@@ -107,13 +107,25 @@ This project is licensed under the MIT License.
 
 tbd
 
+# 🎧 Smule Downloads
+- add all urls that you want to download to cypress/data/smule_urls.txt with new lines inbetween
+- run cypress
+- ```powershell 
+  npx cypress run --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'
+  ```
+- run removeMetadata.ps1 script
+- ```powershell 
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "cd cypress; ./removeMetadata.ps1"
+  ```
+- files appear in F:\Musik\Smule\safetyNet
+
 
 
 # .MD Format Tipps
 
 - [x] Playlist as mp3s download
 - [x] einzelne Videos als mp3/mp4 download
-- [ ] Smule Download
+- [x] Smule Download
 - [ ] Smule Playlist Support (TBD)
 - [x] remove all metadata in cypress/downloads folder
 

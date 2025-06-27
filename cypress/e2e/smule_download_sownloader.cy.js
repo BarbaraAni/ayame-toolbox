@@ -12,7 +12,8 @@ describe('Smule to MP3 via Sownloader', () => {
             cy.writeFile('cypress/data/skipped_urls.txt', '');
 
             for (const url of urls) {
-                cy.log(`Processing: ${url}`);
+                cy.log('Processing: ' + url); // NOT shown in terminal
+                cy.task('logToTerminal', `📥 Starting download for: ${url}`);
                 cy.visit('https://sownloader.com');
 
                 cy.get('input[name="url"]', { timeout: 10000 })
@@ -40,16 +41,18 @@ describe('Smule to MP3 via Sownloader', () => {
                         cy.contains('This might take a few minutes', { timeout: 60000 })
                           .should('not.exist');
 
-                        cy.wait(3000); // allow some buffer for download to complete
+                        cy.wait(1500);
 
                         cy.task('moveDownloadedFile', {
                           baseFolder: 'cypress/downloads',
                           filename
                         }).then((movedPath) => {
                           if (movedPath) {
-                            cy.log(`✅ Saved in: ${movedPath}`);
+                            cy.log(`Saved in: ${movedPath}`);
+                            cy.task(`Saved ${url} ${filename}`);
                           } else {
-                            cy.log('⚠️ Download file not found.');
+                            cy.log('Download file not found.');
+                            cy.task(`Download file not found: ${url} ${filename}`);
                           }
                         });
                       });
