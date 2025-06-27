@@ -7,7 +7,7 @@ $folder = "downloads"  # Zielordner (relativ oder absolut)
 
 # Prüfen, ob ffmpeg installiert ist
 if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
-    Write-Error "ffmpeg ist nicht installiert oder nicht im PATH verfügbar."
+    Write-Error "❌ ffmpeg ist nicht installiert oder nicht im PATH verfügbar."
     exit 1
 }
 
@@ -28,9 +28,9 @@ foreach ($file in $mediaFiles) {
     if (Test-Path $tempOutput) {
         Remove-Item "$input" -Force
         Rename-Item "$tempOutput" "$input"
-        Write-Host "Metadaten entfernt: $($file.Name)`n"
+        Write-Host "✅ Metadaten entfernt: $($file.Name)`n"
     } else {
-        Write-Host "Fehler bei: $($file.Name)`n"
+        Write-Host "⚠️ Fehler bei: $($file.Name)`n"
     }
 }
 
@@ -41,12 +41,14 @@ $filesToMove = Get-ChildItem -Path $mainFolder -Recurse -File
 foreach ($file in $filesToMove) {
     $currentDir = (Resolve-Path $file.DirectoryName).Path
     if ($currentDir -ne $mainFolder) {
-        $targetPath = Join-Path $mainFolder $file.Name
-        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
-        $ext = $file.Extension
+        # HTML-Escape-Zeichen im Namen ersetzen
+        $cleanName = $file.Name -replace 'amp;039;', "'"
+
+        $targetPath = Join-Path $mainFolder $cleanName
+        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($cleanName)
+        $ext = [System.IO.Path]::GetExtension($cleanName)
         $counter = 1
 
-        # Wenn Datei bereits existiert: Umbenennung
         while (Test-Path $targetPath) {
             $targetPath = Join-Path $mainFolder "$baseName`_$counter$ext"
             $counter++
@@ -57,7 +59,7 @@ foreach ($file in $filesToMove) {
     }
 }
 
-# 🔁 Leere Unterordner löschen
+# Leere Unterordner löschen
 $emptyFolders = Get-ChildItem -Path $mainFolder -Recurse -Directory | Where-Object {
     @(Get-ChildItem -Path $_.FullName -Force -Recurse -File).Count -eq 0
 }
