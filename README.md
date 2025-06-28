@@ -109,7 +109,7 @@ tbd
 
 # 🎧 Smule Downloads
 - add all urls that you want to download to cypress/data/smule_urls.txt with new lines inbetween
-- in dev tools console, run the following command - then copy to smule_urls.txt and replace all \n with enters
+- in dev tools console, run the following command - then copy to smule_urls.txt and replace all \n with enters (the whole page needs to be loaded - scroll down!)
 - ```powershell 
     [...document.querySelectorAll('a[href*="/recording/"]')]
     .map(a => a.href)
@@ -118,12 +118,46 @@ tbd
     ```
 - run cypress
 - ```powershell 
-  npx cypress run --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'
-  ```
+    npx cypress run --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'
+    ```
+- generate metadata file content:
+- ```powershell
+    (async () => {
+    // Wartefunktion für DOM-Inhalte
+    const wait = ms => new Promise(res => setTimeout(res, ms));
+    
+    // Warte 2 Sekunden, damit die Seite ihre Inhalte vollständig rendert
+    await wait(2000);
+    
+    const items = new Map();
+    
+    [...document.querySelectorAll('a[href*="/recording/"]')].forEach(a => {
+    const url = a.href;
+    
+        const container = a.closest('.sc-djvmMF')?.parentElement;
+        const names = [...(container?.querySelectorAll('.sc-gsnTZi.hNtid') || [])].map(span => span.textContent.trim());
+    
+        const name1 = names[0] || '';
+        const name2 = names[1] || '';
+        const interpreten = `${name1} ft. ${name2}`.trim();
+    
+        if (name1 || name2) {
+          items.set(url, interpreten);
+        }
+    });
+    
+    const result = [...items.entries()]
+    .map(([url, interpreten]) => `${url}\t${interpreten}`)
+    .join('\n');
+    
+    // Gib den finalen Text direkt aus
+    console.log(result);
+    })();
+    ```
 - run removeMetadata.ps1 script
 - ```powershell 
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "cd cypress; ./removeMetadata.ps1"
-  ```
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "cd cypress; ./removeMetadata.ps1"
+    ```
 - files appear in F:\Musik\Smule\safetyNet
 
 
