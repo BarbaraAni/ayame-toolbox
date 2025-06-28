@@ -116,6 +116,7 @@ tbd
     .filter((v, i, a) => a.indexOf(v) === i)  // remove duplicates
     .join('\n')
     ```
+- run npm install if needed
 - run cypress
 - ```powershell 
     npx cypress run --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'
@@ -139,7 +140,7 @@ tbd
     
         const name1 = names[0] || '';
         const name2 = names[1] || '';
-        const interpreten = `${name1} ft. ${name2}`.trim();
+        const interpreten = `${name1} ft ${name2}`.trim();
     
         if (name1 || name2) {
           items.set(url, interpreten);
@@ -154,9 +155,9 @@ tbd
     console.log(result);
     })();
     ```
-- run removeMetadata.ps1 script
+- run runScripts.ps1 script (or script .\1_cleanMetadata.ps1 then .\2_addMetadata.ps1 then .\3_moveAndCleanup.ps1)
 - ```powershell 
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "cd cypress; ./removeMetadata.ps1"
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "cd cypress; ./runScripts.ps1"
     ```
 - files appear in F:\Musik\Smule\safetyNet
 

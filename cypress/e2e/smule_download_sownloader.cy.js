@@ -24,7 +24,7 @@ describe('Smule to MP3 via Sownloader', () => {
 
                 cy.get('body').then($body => {
                     if ($body.text().includes('Error! Could not find performance data. Please try again later.')) {
-                        cy.log('❌ Error: No performance data. Skipping...');
+                        cy.log('XX Error: No performance data. Skipping...');
                         cy.writeFile('cypress/data/skipped_urls.txt', `${url}\n`, { flag: 'a+' }); // anhängen
                         return;
                     }
@@ -44,21 +44,25 @@ describe('Smule to MP3 via Sownloader', () => {
                             cy.contains('This might take a few minutes', { timeout: 60000 })
                                 .should('not.exist');
 
-                            cy.waitUntil(() =>
-                                cy.task('checkFileExists', {
-                                    folder: 'cypress/downloads',
-                                    filename
-                                }), {
-                                    errorMsg: `XX File never appeared: ${filename}`,
-                                    timeout: 15000,
-                                    interval: 1000
+                            const failedDownloads = [];
+
+                            cy.waitUntil(() => {
+                                // your condition, e.g.:
+                                return cy.task('checkIfFileExists', 'downloads/myfile.mp3', { log: false });
+                            }, {
+                                timeout: 20000,
+                                interval: 500,
+                                errorMsg: 'File did not download in time',
+                                verbose: false,
+                                failSilently: true
+                            }).then((success) => {
+                                if (!success) {
+                                    failedDownloads.push(url);
+                                    cy.log(`XX Download failed for: ${filename}`);
+                                } else {
+                                    cy.log('Download succeeded');
                                 }
-                            ).catch(() => {
-                                 // Datei ist nach X Sekunden nicht da
-                                 cy.task('logToTerminal', `XX File never appeared: ${filename}`);
-                                 cy.writeFile('cypress/data/skipped_urls.txt', `${url}\n`, { flag: 'a+' });
-                                 return; // überspringe Rest
-                             });
+                            });
 
                             cy.task('moveDownloadedFile', {
                                 baseFolder: 'cypress/downloads',

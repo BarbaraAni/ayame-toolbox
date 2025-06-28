@@ -26,11 +26,11 @@ for ($i = 0; $i -lt $mediaFiles.Count; $i++) {
         if (Test-Path -LiteralPath $tempFile) {
             Remove-Item -LiteralPath $file.FullName -Force
             Rename-Item -LiteralPath $tempFile -NewName $file.Name
-            Write-Host "🎵 Metadata gesetzt: $artist (Album: Smule) → $($file.Name)"
+            Write-Host "Metadata gesetzt: $artist (Album: Smule) -> $($file.Name)"
         } else {
-            Write-Warning "❌ Fehler beim Setzen des Interpreten für: $($file.Name)"
+            Write-Warning "XX Fehler beim Setzen des Interpreten für: $($file.Name)"
         }
     } else {
-        Write-Warning "⚠️ Kein Artist vorhanden für: $($file.Name)"
+        Write-Warning "!! Kein Artist vorhanden für: $($file.Name)"
     }
 }
