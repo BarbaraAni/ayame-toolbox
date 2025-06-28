@@ -12,9 +12,9 @@ Get-ChildItem -Path $source -Recurse -Include *.mp3, *.m4a, *.mp4 -File | ForEac
     Write-Host "Bereinige: $input"
     ffmpeg -y -i "`"$input`"" -map_metadata -1 -c copy "`"$tempOutput`"" 2>> $logFile
 
-    if (Test-Path $tempOutput) {
-        Remove-Item $input -Force
-        Rename-Item $tempOutput -NewName $_.Name
+    if (Test-Path -LiteralPath $tempOutput) {
+        Remove-Item -LiteralPath $input -Force
+        Rename-Item -LiteralPath $tempOutput -NewName $_.Name
     } else {
         Write-Warning "Fehler beim Bereinigen von $_.Name"
     }

@@ -103,7 +103,7 @@ This project is licensed under the MIT License.
 
 ### 🎯 You're ready to transcribe! Enjoy using Ayame Toolbox Backend! 🚀
 
-# 🎧 Ayame Toolbox Frontend
+# Ayame Toolbox Frontend
 
 tbd
 
@@ -119,7 +119,7 @@ tbd
 - run npm install if needed
 - run cypress
 - ```powershell 
-    npx cypress run --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'
+    npx cypress run --browser chrome --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'
     ```
 - generate metadata file content:
 - ```powershell
@@ -155,7 +155,7 @@ tbd
     console.log(result);
     })();
     ```
-- run runScripts.ps1 script (or script .\1_cleanMetadata.ps1 then .\2_addMetadata.ps1 then .\3_moveAndCleanup.ps1)
+- run runScripts.ps1 script (or script .\1_cleanMetadata.ps1 then .\2_moveAndCleanup.ps1 then 3_addMetadata.ps1)
 - ```powershell 
     powershell -NoProfile -ExecutionPolicy Bypass -Command "cd cypress; ./runScripts.ps1"
     ```

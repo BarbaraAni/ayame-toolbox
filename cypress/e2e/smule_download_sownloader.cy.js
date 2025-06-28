@@ -7,14 +7,21 @@ Cypress.on('uncaught:exception', () => {
 
 describe('Smule to MP3 via Sownloader', () => {
     it('downloads MP3 from Sownloader', () => {
+        const now = new Date();
+        const timestamp = now.toISOString().replace('T', ' ').split('.')[0];
+        cy.task('logToTerminal', `=== Starting Smule download at ${timestamp} ===`);
+
         cy.readFile('cypress/data/smule_urls.txt').then((content) => {
             const urls = content.split('\n').filter(Boolean);
 
             cy.writeFile('cypress/data/skipped_urls.txt', '');
 
+            let count = 0;
             for (const url of urls) {
+                count++;
                 cy.log('Processing: ' + url); // NOT shown in terminal
-                cy.task('logToTerminal', `Starting download for: ${url}`);
+                cy.task('logToTerminal', `(${count}/${urls.length})`);
+                cy.task('logToTerminal', `[Starting] download for: ${url}`);
                 cy.visit('https://sownloader.com');
 
                 cy.get('input[name="url"]', { timeout: 10000 })
@@ -37,7 +44,7 @@ describe('Smule to MP3 via Sownloader', () => {
                             const title = match ? match[1].trim() : 'Unknown';
                             const safeTitle = title.replace(/[:*?"<>|\\\/]/g, '_');
                             const filename = `${safeTitle}.mp3`;
-                            cy.task('logToTerminal', `Title ${title} - SafeTitle: ${safeTitle}`);
+                            cy.task('logToTerminal', `[TITLE] ${title} - SafeTitle: ${safeTitle}`);
 
                             cy.wrap($btn).click();
 
@@ -73,10 +80,10 @@ describe('Smule to MP3 via Sownloader', () => {
                             }).then((movedPath) => {
                                 if (movedPath) {
                                     cy.log(`Saved in: ${movedPath}`);
-                                    cy.task('logToTerminal', `SUCCESS ${url}`);
+                                    cy.task('logToTerminal', `[SUCCESS] ${url}`);
                                 } else {
                                     cy.log('Download file not found.');
-                                    cy.task('logToTerminal', `XX MOVE FAIL: ${url}`);
+                                    cy.task('logToTerminal', `[XX MOVE FAIL]: ${url}`);
                                 }
                             });
                         });

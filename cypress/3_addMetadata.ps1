@@ -1,6 +1,6 @@
 param (
-    [string]$source = "F:\Coding\1_Private_Project\ayame_toolbox\cypress\downloads",
-    #[string]$source = "F:\Musik\Smule\safetyNet",
+    #[string]$source = "F:\Coding\1_Private_Project\ayame_toolbox\cypress\downloads",
+    [string]$source = "F:\Musik\Smule\safetyNet",
     [string]$metadata = "F:\Coding\1_Private_Project\ayame_toolbox\cypress\data\metadata.txt"
 )
 
