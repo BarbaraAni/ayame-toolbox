@@ -47,8 +47,10 @@ describe('Smule to MP3 via Sownloader', () => {
                             const failedDownloads = [];
 
                             cy.waitUntil(() => {
-                                // your condition, e.g.:
-                                return cy.task('checkIfFileExists', 'downloads/myfile.mp3', { log: false });
+                                return cy.task('checkFileExists', {
+                                    folder: 'cypress/downloads',
+                                    filename
+                                });
                             }, {
                                 timeout: 20000,
                                 interval: 500,
@@ -59,6 +61,7 @@ describe('Smule to MP3 via Sownloader', () => {
                                 if (!success) {
                                     failedDownloads.push(url);
                                     cy.log(`XX Download failed for: ${filename}`);
+                                    cy.writeFile('cypress/data/skipped_urls.txt', `${url}\n`, { flag: 'a+' });
                                 } else {
                                     cy.log('Download succeeded');
                                 }
