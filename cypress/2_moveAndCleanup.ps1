@@ -7,17 +7,21 @@ New-Item -ItemType Directory -Force -Path $target | Out-Null
 
 Get-ChildItem -Path $source -Recurse -Include *.mp3, *.m4a, *.mp4 -File | ForEach-Object {
     $cleanedName = $_.Name -replace 'amp;039;', "'" -replace 'amp;amp;', '&'
+    $baseName    = [System.IO.Path]::GetFileNameWithoutExtension($cleanedName)
+    $ext         = [System.IO.Path]::GetExtension($cleanedName)
+
+    # Start with the cleaned name as the target
     $targetPath = Join-Path $target $cleanedName
-    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($cleanedName)
-    $ext = [System.IO.Path]::GetExtension($cleanedName)
     $counter = 1
 
-    while (Test-Path $targetPath) {
-        $targetPath = Join-Path $target "$baseName`_$counter$ext"
+    # IMPORTANT: use -LiteralPath because names like "[INST]" contain wildcard chars
+    while (Test-Path -LiteralPath $targetPath) {
+        $targetPath = Join-Path $target ("{0}_{1}{2}" -f $baseName, $counter, $ext)
         $counter++
     }
 
-    Move-Item -LiteralPath $_.FullName -Destination $targetPath -Force
+    # Move (no -Force so you notice unexpected collisions)
+    Move-Item -LiteralPath $_.FullName -Destination $targetPath
     Write-Host "Verschoben nach: $([System.IO.Path]::GetFileName($targetPath))"
 }
 

@@ -135,7 +135,7 @@ tbd
     [...document.querySelectorAll('a[href*="/recording/"]')].forEach(a => {
     const url = a.href;
     
-        const container = a.closest('.sc-djvmMF')?.parentElement;
+        const container = a.closest('.sc-eFWqGp.bYDMSo')?.parentElement; // this class can change -> ask chatGPT to fix the function then
         const names = [...(container?.querySelectorAll('.sc-gsnTZi.hNtid') || [])].map(span => span.textContent.trim());
     
         const name1 = names[0] || '';
