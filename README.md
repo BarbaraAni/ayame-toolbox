@@ -109,51 +109,47 @@ tbd
 
 # 🎧 Smule Downloads
 - add all urls that you want to download to cypress/data/smule_urls.txt with new lines inbetween
-- in dev tools console, run the following command - then copy to smule_urls.txt and replace all \n with enters (the whole page needs to be loaded - scroll down!)
-- ```powershell 
-    [...document.querySelectorAll('a[href*="/recording/"]')]
-    .map(a => a.href)
-    .filter((v, i, a) => a.indexOf(v) === i)  // remove duplicates
-    .join('\n')
+- in dev tools console, run the following command - then copy to metadata.txt (the whole page needs to be loaded - scroll down!)
+  - ```powershell
+    (async () => {
+      const wait = ms => new Promise(res => setTimeout(res, ms));
+      await wait(2000);
+
+      const items = new Map();
+
+      // iterate each recording card
+      document.querySelectorAll('.sc-eFWqGp.bYDMSo').forEach(card => {
+        // pick one recording link from this card
+        const link = card.querySelector('a[href*="/recording/"]');
+        if (!link) return;
+
+        const url = link.href;
+
+        // get up to two usernames *inside this card only*
+        const names = [...card.querySelectorAll('.sc-gsnTZi.hNtid')]
+          .map(el => el.textContent.trim())
+          .filter(Boolean);
+
+        const name1 = names[0] || '';
+        const name2 = names[1] || '';
+        const interpreten = name1 && name2 ? `${name1} ft ${name2}` : (name1 || name2);
+
+        if (interpreten) {
+          items.set(url, interpreten); // Map dedupes identical URLs
+        }
+      });
+
+      const result = [...items.entries()]
+        .map(([url, interpreten]) => `${url}\t${interpreten}`)
+        .join('\n');
+
+      console.log(result);
+    })();
     ```
 - run npm install if needed
 - run cypress
 - ```powershell 
     npx cypress run --browser chrome --e2e --spec 'cypress/e2e/smule_download_sownloader.cy.js'
-    ```
-- generate metadata file content:
-- ```powershell
-    (async () => {
-    // Wartefunktion für DOM-Inhalte
-    const wait = ms => new Promise(res => setTimeout(res, ms));
-    
-    // Warte 2 Sekunden, damit die Seite ihre Inhalte vollständig rendert
-    await wait(2000);
-    
-    const items = new Map();
-    
-    [...document.querySelectorAll('a[href*="/recording/"]')].forEach(a => {
-    const url = a.href;
-    
-        const container = a.closest('.sc-eFWqGp.bYDMSo')?.parentElement; // this class can change -> ask chatGPT to fix the function then
-        const names = [...(container?.querySelectorAll('.sc-gsnTZi.hNtid') || [])].map(span => span.textContent.trim());
-    
-        const name1 = names[0] || '';
-        const name2 = names[1] || '';
-        const interpreten = `${name1} ft ${name2}`.trim();
-    
-        if (name1 || name2) {
-          items.set(url, interpreten);
-        }
-    });
-    
-    const result = [...items.entries()]
-    .map(([url, interpreten]) => `${url}\t${interpreten}`)
-    .join('\n');
-    
-    // Gib den finalen Text direkt aus
-    console.log(result);
-    })();
     ```
 - run runScripts.ps1 script (or script .\1_cleanMetadata.ps1 then .\2_moveAndCleanup.ps1 then 3_addMetadata.ps1)
 - ```powershell 

@@ -11,8 +11,13 @@ describe('Smule to MP3 via Sownloader', () => {
         const timestamp = now.toISOString().replace('T', ' ').split('.')[0];
         cy.task('logToTerminal', `=== Starting Smule download at ${timestamp} ===`);
 
-        cy.readFile('cypress/data/smule_urls.txt').then((content) => {
-            const urls = content.split('\n').filter(Boolean);
+        cy.readFile('cypress/data/metadata.txt').then((content) => {
+        const urls = content
+            .split(/\r?\n/)                           // split into lines (handles Windows & Unix newlines)
+            .map(line => line.split('\t')[0].trim())  // take text before first tab
+            .filter(Boolean);                         // drop empty lines
+
+            urls.push("https://www.smule.com/recording/fake-coz-last-aint-workin");
 
             cy.writeFile('cypress/data/skipped_urls.txt', '');
 
@@ -35,6 +40,17 @@ describe('Smule to MP3 via Sownloader', () => {
                         cy.writeFile('cypress/data/skipped_urls.txt', `${url}\n`, { flag: 'a+' }); // anhängen
                         return;
                     }
+
+                    cy.get('body').then($body => {
+                      const btn = $body.find('button[type="submit"]#button-addon2');
+
+                      if (btn.length && btn.text().trim() === 'Download') {
+                        cy.wrap(btn).click();
+                        cy.log('✅ Clicked the Download button');
+                      } else {
+                        cy.log('ℹ️ Download button not found, continuing...');
+                      }
+                    });
 
                     cy.contains('button', 'Download as MP3', { timeout: 20000 })
                         .should('be.visible')
