@@ -24,8 +24,9 @@ describe('Smule to MP3 via Sownloader', () => {
             let count = 0;
             for (const url of urls) {
                 count++;
-                cy.log('Processing: ' + url); // NOT shown in terminal
-                cy.task('logToTerminal', `(${count}/${urls.length})`);
+                const timestamp = now.toISOString().replace('T', ' ').split('.')[0];
+                cy.task('logToTerminal', `=== ${timestamp} ===`);
+                cy.task('logToTerminal', `=== (${count}/${urls.length}) ===`);
                 cy.task('logToTerminal', `[Starting] download for: ${url}`);
                 cy.visit('https://sownloader.com');
 

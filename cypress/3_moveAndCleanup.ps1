@@ -6,7 +6,7 @@ param (
 New-Item -ItemType Directory -Force -Path $target | Out-Null
 
 Get-ChildItem -Path $source -Recurse -Include *.mp3, *.m4a, *.mp4 -File | ForEach-Object {
-    $cleanedName = $_.Name -replace 'amp;039;', "'" -replace 'amp;amp;', '&'
+    $cleanedName = $_.Name -replace 'amp;039;', "'" -replace 'amp;amp;', '&' -replace 'amp;quot;', "'"
     $baseName    = [System.IO.Path]::GetFileNameWithoutExtension($cleanedName)
     $ext         = [System.IO.Path]::GetExtension($cleanedName)
 
